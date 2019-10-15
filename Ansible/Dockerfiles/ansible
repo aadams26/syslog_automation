@@ -34,12 +34,16 @@ RUN echo 'deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main' >> /e
     apt update; \
     apt install -y ansible
 
-WORKDIR /automation
-
 # Copy ansible files into ansible workspace
-COPY files/ .
+COPY files/ansible /automation
+COPY files/forwardingStatus.csv /temp/ansible/syslog/
 
 # Set host file location to workspace inventories
 RUN sed -i 's+#inventory      = /etc/ansible/hosts+inventory      = /automation/ansible/inventories/hosts+g' /etc/ansible/ansible.cfg 
+RUN sed -i '/[defaults]/a roles_path      = /etc/ansible/roles/' /etc/ansible/ansible.cfg
+
+# Make tmp folders for syslog reporting
+RUN mkdir /tmp/ansible; \
+    mkdir /tmp/ansible/syslog
 
 CMD sleep infinity

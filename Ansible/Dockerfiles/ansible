@@ -39,4 +39,7 @@ WORKDIR /automation
 # Copy ansible files into ansible workspace
 COPY files/ .
 
+# Set host file location to workspace inventories
+RUN sed -i 's+#inventory      = /etc/ansible/hosts+inventory      = /automation/ansible/inventories/hosts+g' /etc/ansible/ansible.cfg 
+
 CMD sleep infinity

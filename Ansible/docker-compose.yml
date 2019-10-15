@@ -8,14 +8,26 @@ services:
     image: local:ansible
     networks:
       - default
-  test_container:
-    container_name: test_container
+  test_container_1:
+    container_name: test_container_1
     build:
       context: Dockerfiles
       dockerfile: ssh
     image: local:sshd
     ports:
       - "2222:22"
+    expose:
+      - 22
+    networks:
+      - default
+  test_container_2:
+    container_name: test_container_2
+    build:
+      context: Dockerfiles
+      dockerfile: ssh
+    image: local:sshd
+    ports:
+      - "2223:22"
     expose:
       - 22
     networks:

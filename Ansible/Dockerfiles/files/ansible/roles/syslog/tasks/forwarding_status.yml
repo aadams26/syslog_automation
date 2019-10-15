@@ -18,5 +18,5 @@
   delegate_to: localhost
   lineinfile:
     path: /tmp/ansible/syslog/forwardingStatus.csv
-    line: '{{ hostvars[inventory_hostname_short]['ansible_facts']['fqdn'] }},{{ configVersion.stdout }},{{ forwardingStatus.end }}, {{ forwardingStatus.rc }}'
+    line: "{{ hostvars[inventory_hostname_short]['ansible_facts']['fqdn'] }},{{ configVersion.stdout }},{{ forwardingStatus.end }},{{ forwardingStatus.rc }}""
     insertafter: fqdn,version,time,rc

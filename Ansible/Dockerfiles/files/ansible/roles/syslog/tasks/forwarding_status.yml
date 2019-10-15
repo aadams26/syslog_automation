@@ -1,0 +1,11 @@
+---
+- name: Confirm that forwardLogs are correctly configured
+  shell: grep -q 10.150.202.11 /etc/rsyslog.d/forwardLogs.conf
+  ignore_errors: true
+  register: forwardingStatus
+
+- name: Dump output to CSV
+  delegate_to: localhost
+  copy:
+    content: "{{ forwardingStatus | to_nice_json }}"
+    dest: "/tmp/ansible/syslog/forwarding_status/{{ hostvars[inventory_hostname_short]['ansible_facts']['fqdn'] }}_syslog_forwarding_status.csv"

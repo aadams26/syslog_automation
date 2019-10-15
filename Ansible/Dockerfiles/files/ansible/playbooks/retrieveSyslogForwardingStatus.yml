@@ -1,0 +1,5 @@
+---
+- hosts: all
+  name: Obtain Syslog forwarding status
+  roles:
+   - syslog      

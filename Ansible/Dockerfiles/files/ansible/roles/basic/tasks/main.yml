@@ -1,0 +1,9 @@
+- hosts: all
+  tasks:
+  - shell: if grep -q this /etc/rsyslog.d/forwardLogs.conf; then echo True; else echo False; fi
+    register: forwardLogs_found
+
+  - set_fact:
+          retrieved_forwardLog: "True"
+    when: >
+        forwardLogs_found.stdout.find('True') != -1

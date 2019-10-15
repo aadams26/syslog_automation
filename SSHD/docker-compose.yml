@@ -1,0 +1,13 @@
+version: "3.2"
+services:
+  svr:
+    build: ./
+    image: local:sshd
+    ports:
+      - "2222:22"
+    expose:
+      - 22
+    networks:
+      - default
+networks:
+   default:

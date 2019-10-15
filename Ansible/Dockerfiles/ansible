@@ -1,0 +1,42 @@
+FROM python:3.6-slim-buster
+
+# Prep the environment
+RUN apt-get update; apt-get upgrade -y; apt-get autoremove -y; apt-get clean
+# LOCALES
+RUN echo locales locales/locales_to_be_generated select en_US.UTF-8 | debconf-set-selections;\
+    echo locales locales/default_environment_locale select en_US.UTF-8 | debconf-set-selections;\
+    export LANGUAGE="en_US.UTF-8";\
+    echo 'LANGUAGE="en_US.UTF-8"' >> /etc/default/locale;\
+    echo 'LC_ALL="en_US.UTF-8"' >> /etc/default/locale;\
+    apt-get install -y locales;\
+    locale-gen
+
+# TIMEZONE
+ENV TZ=Pacific/Honolulu
+RUN echo tzdata tzdata/Zones/Pacific select Honolulu | debconf-set-selections;\
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime;\
+    echo $TZ > /etc/timezone;\
+    dpkg-reconfigure tzdata
+
+# Install packages
+RUN apt-get install -y gnupg2 vim sudo procps sshpass net-tools nano bind9utils ca-certificates man curl \
+    aptitude apt-file debconf-utils iputils-ping dnsutils emacs-nox iproute2 openssh-client; apt-file update
+
+# LDAP
+RUN apt-get install -y ldap-utils;\
+    sed -i -re s'|#(BASE).*|\1\tdc=home,dc=arpa|'g -re s'|#(URI).*|\1\tldaps://ldap.home.arpa|'g /etc/ldap/ldap.conf;\
+    sed -i -re s'|(TLS_CACERT).*|\1\t/usr/local/share/ca-certificates/ca-chain.crt|'g /etc/ldap/ldap.conf
+
+# Install ansible & create workspace
+RUN mkdir /automation
+RUN echo 'deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main' >> /etc/apt/sources.list; \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367; \
+    apt update; \
+    apt install -y ansible
+
+WORKDIR /automation
+
+# Copy ansible files into ansible workspace
+COPY files/ .
+
+CMD sleep infinity

@@ -1,0 +1,7 @@
+all:
+  hosts:
+    ssh.home.arpa:
+  vars:
+    ansible_user: ccregor
+    ansible_password: SUPERSECRETPASSTHANKSFORDELETINGMYOLDONE;)
+    

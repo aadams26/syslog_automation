@@ -1,0 +1,25 @@
+version: "3.2"
+services:
+  svr:
+    container_name: ansible_svr
+    build:
+      context: Dockerfiles
+      dockerfile: ansible
+    image: local:ansible
+    networks:
+      - default
+  test_container:
+    container_name: test_container
+    build:
+      context: Dockerfiles
+      dockerfile: ssh
+    image: local:sshd
+    ports:
+      - "2222:22"
+    expose:
+      - 22
+    networks:
+      - default
+    
+networks:
+   default:

@@ -1,0 +1,5 @@
+---
+- name: Obtain Syslog forwarding status
+  include_role:
+    name: syslog
+    tasks_from: forwarding_status

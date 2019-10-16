@@ -1,22 +1,43 @@
 ---
+#===============================================================================================#
+#                                                                                               #
+#  FORWARDING STATUS TASK                                                                       #
+#                                                                                               #
+#===============================================================================================#
+#
+# This task relies on the existence of a forwardingStatus.csv, which is purged and updated
+# every time this task is run. This CSV is utilized for reporting on the status of Syslog 
+# Forwarding configuration to the Syslog Aggregator.
+# 
+# To update the reporting columns, locate this CSV on local at 
+# /tmp/ansible/syslog/forwardingStatus.csv and modify along with the 'lineinfile' module used 
+# to insert corresponding values.
+#
+# Arielle Adams - 10/15/19
+#===============================================================================================#
+
 - name: Start from fresh forwardingStatus CSV
   run_once: true
   local_action: command sed -i '2,$d' /tmp/ansible/syslog/forwardingStatus.csv
 
 - name: Confirm that forwardLogs are correctly configured
-  shell: grep -q 10.150.202.11 /etc/rsyslog.d/forwardLogs.conf
+  shell: "grep -q 10.150.202.11 /etc/rsyslog.d/forwardLogs.conf"
   ignore_errors: true
   register: forwardingStatus
 
 - name: Grab config version
-# TO DO: determine how to grab version
-  shell: grep -q version /etc/rsyslog.d/forwardLogs.conf
+  shell: "grep -o 'Version.*' /etc/rsyslog.d/forwardLogs.conf | cut -f2- -d:"
   ignore_errors: true
   register: configVersion
+
+- name: Grab config date
+  shell: "grep -o 'Config Date.*' /etc/rsyslog.d/forwardLogs.conf | cut -f2- -d:"
+  ignore_errors: true
+  register: configDate
 
 - name: Add to forwardStatus report
   delegate_to: localhost
   lineinfile:
     path: /tmp/ansible/syslog/forwardingStatus.csv
-    line: "{{ hostvars[inventory_hostname_short]['ansible_facts']['fqdn'] }},{{ configVersion.stdout }},{{ forwardingStatus.end }},{{ forwardingStatus.rc }}""
-    insertafter: fqdn,version,time,rc
+    line: "{{ hostvars[inventory_hostname_short]['ansible_facts']['fqdn'] }},{{ configVersion.stdout }},{{ configDate.stdout }},{{ ansible_date_time.date }},{{ forwardingStatus.rc }}"
+    insertafter: EOF
